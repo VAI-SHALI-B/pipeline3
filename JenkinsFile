@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'StudentApplication'
+        APP_VERSION = '1.0'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/VAI-SHALI-B/pipeline3.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'python -m py_compile app.py'
+                echo 'Build successful: app.py compiled correctly.'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                input message: "Approve deployment of ${env.APP_NAME} version ${env.APP_VERSION}?",
+                      ok: 'Release'
+                bat 'python app.py'
+            }
+        }
+    }
+}
